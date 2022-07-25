@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 INF()
 {
     MSG="$1"
@@ -40,7 +42,6 @@ declare -r I3_PACKAGES_COMMON=" \
     gstreamer1.0-plugins-ugly \
     gstreamer1.0-plugins-bad \
     gstreamer1.0-alsa \
-    gstreamer1.0-fluendo-mp3 \
     gstreamer1.0-libav \
     "
 
@@ -69,7 +70,7 @@ install_i3_gaps()
 
     if [[ "$VER" == "22.04" ]]; then
         wget -qO - https://regolith-desktop.org/regolith.key | \
-        gpg --dearmor | tee /usr/share/keyrings/regolith-archive-keyring.gpg > /dev/null
+        gpg --dearmor | sudo tee /usr/share/keyrings/regolith-archive-keyring.gpg > /dev/null
 
         echo deb "[arch=amd64 signed-by=/usr/share/keyrings/regolith-archive-keyring.gpg] \
             https://regolith-desktop.org/release-ubuntu-jammy-amd64 jammy main" | \
@@ -119,13 +120,16 @@ show_postinstall_instructions()
 install_i3()
 {
     INF "Start installation of i3"
-    sudo apt install -y "$I3_PACKAGES_COMMON"
+    sudo apt install -y ${I3_PACKAGES_COMMON}
+
+    install_i3_gaps
+
 }
 
 install_cmd()
 {
     INF "Start installation of cmd packages"
-    sudo apt install -y "$CMD_PACKAGES_COMMON"
+    sudo apt install -y ${CMD_PACKAGES_COMMON}
 
 }
 
