@@ -35,7 +35,6 @@ declare -r UBUNTU_BASE=" \
     libyajl-dev \
     libev-dev \
     python3-dev \
-    python2.7-dev \
     exuberant-ctags \
     clang-format \
 "
@@ -60,9 +59,9 @@ declare -r COMMON_GRAPHICAL=" \
 
 prepare_ubuntu() {
     INF "Updating ubuntu"
-    $(SUDO_CMD) "${PACKAGE_MANAGER}" update -y
-    $(SUDO_CMD) "${PACKAGE_MANAGER}" upgrade -y
-    $(SUDO_CMD) "${PACKAGE_MANAGER}" dist-upgrade -y
+    ${SUDO_CMD} "${PACKAGE_MANAGER}" update -y
+    ${SUDO_CMD} "${PACKAGE_MANAGER}" upgrade -y
+    ${SUDO_CMD} "${PACKAGE_MANAGER}" dist-upgrade -y
 }
 
 prepare_fedora() {
@@ -95,7 +94,7 @@ configure_vim() {
     git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
     install -d $(pwd)/.vim 
     cp -a $(pwd)/.vim/* -t "$HOME"/.vim
-\    install $(pwd)/.vimrc "$HOME"
+    install $(pwd)/.vimrc "$HOME"
 }
 
 configure_graphics() {

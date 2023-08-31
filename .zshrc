@@ -74,6 +74,9 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
 
+export HISTTIMEFORMAT='%F %T'
+SAVEHIST=500000
+
 # Which plugins would you like to load?
 # Standard plugins can be found in ~/.oh-my-zsh/plugins/*
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
@@ -127,6 +130,21 @@ alias sb2='screen /dev/ttyUSB2 115200'
 alias sb3='screen /dev/ttyUSB3 115200'
 alias sb4='screen /dev/ttyUSB4 115200'
 alias sb5='screen /dev/ttyUSB5 115200'
+
+th() { printf "0x%x\n" $1; }                                                                                                          
+td() { printf "$d\n" $((16#${1:2})); }
+btk() {
+    VAL=$1
+    [[ "${VAL:0:2}" == "0x" ]] && VAL=$(td $VAL)
+    echo "scale=2; $VAL/1024" | bc
+}
+
+btm() { echo "scale=2; `btk $1`/1024" | bc}
+btg() { echo "scale=2; `btm $1`/1024" | bc}
+
+gtb() { echo $(($1 * 1024 * 1024 * 1024)) }
+gtk() { echo $(($1 * 1024 * 1024)) }
+gtm() { echo $(($1 * 1024)) }
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
