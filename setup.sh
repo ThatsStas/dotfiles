@@ -82,6 +82,10 @@ configure_zsh() {
     git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
     install $(pwd)/.bashrc ~
     install $(pwd)/.zshrc ~
+
+    git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ~/powerlevel10k
+    echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
+
     install $(pwd)/.p10k.zsh ~
 }
 
