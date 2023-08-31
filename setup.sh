@@ -94,8 +94,8 @@ configure_vim() {
 
     git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
     install -d $(pwd)/.vim 
-    install $(pwd)/.vim/* "$HOME"/.vim
-    install $(pwd)/.vimrc "$HOME"
+    cp -a $(pwd)/.vim/* -t "$HOME"/.vim
+\    install $(pwd)/.vimrc "$HOME"
 }
 
 configure_graphics() {
