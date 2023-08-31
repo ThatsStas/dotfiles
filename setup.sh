@@ -2,176 +2,183 @@
 
 set -e
 
-INF()
-{
+PACKAGE_MANAGER=""
+SUDO_CMD="sudo "
+PACKAGES=""
+PACKAGES_FULL=""
+
+INF() {
     MSG="$1"
     echo "[$(date)][INF] --- $MSG"
 }
 
-ERR()
-{
+ERR() {
     MSG="$1"
     echo "[$(date)][ERR] --- $MSG"
 }
 
-
-# Now, only ubuntu based OS are supported. This approach should be simple to extend
-declare -r I3_PACKAGES_COMMON=" \
-    libstartup-notification0-dev \
-    libxcb-xrm0 \
-    i3 \
-    i3blocks \
-    libxcb1-dev \
-    libxcb-keysyms1-dev \
-    libpango1.0-dev \
-    libxcb-util0-dev \
-    libxcb-icccm4-dev \
-    libxcb-randr0-dev \
-    libxcb-cursor-dev \
-    libxcb-xinerama0-dev \
-    libxcb-xkb-dev \
-    libxkbcommon-dev \
-    libxkbcommon-x11-dev \
-    libxcb-shape0-dev \
-    compton \
-    feh \
-    libxcb-xrm-dev \
-    libxvidcore4 \
-    gstreamer1.0-plugins-base \
-    gstreamer1.0-plugins-good \
-    gstreamer1.0-plugins-ugly \
-    gstreamer1.0-plugins-bad \
-    gstreamer1.0-alsa \
-    gstreamer1.0-libav \
-    "
-
-declare -r CMD_PACKAGES_COMMON=" \
+declare -r COMMON_BASE=" \
     vim \
+    neovim \
     gcc \
     make \
-    build-essential \
     binutils \
     zsh \
     autoconf \
     automake \
     cmake \
+    shellcheck \
+"
+
+declare -r UBUNTU_BASE=" \
+    build-essential \
     libyajl-dev \
     libev-dev \
     python3-dev \
     python2.7-dev \
     exuberant-ctags \
     clang-format \
-    "
+"
+declare -r FEDORA_BASE=" \
+    yajl-devel \
+    libverto-libev-devel \
+    ctags \
+    vim-omnicppcomplete \
+    python3-devel \
+"
 
-# sudo add-apt-repository -y ppa:regolith-linux/stable 
-install_i3_gaps()
-{
-    VER="$(lsb_release -a 2>&1 | grep Release | xargs | cut -d ' ' -f2)"
+declare -r FEDORA_DEV_GROUP="C Development Tools and Libraries"
 
-    if [[ "$VER" == "22.04" ]]; then
-        wget -qO - https://regolith-desktop.org/regolith.key | \
-        gpg --dearmor | sudo tee /usr/share/keyrings/regolith-archive-keyring.gpg > /dev/null
+declare -r COMMON_GRAPHICAL=" \
+    emacs \
+    i3 \
+    autorandr \
+    feh \
+    i3-gaps \
+    i3blocks \
+"
 
-        echo deb "[arch=amd64 signed-by=/usr/share/keyrings/regolith-archive-keyring.gpg] \
-            https://regolith-desktop.org/release-ubuntu-jammy-amd64 jammy main" | \
-            sudo tee /etc/apt/sources.list.d/regolith.list
+prepare_ubuntu() {
+    INF "Updating ubuntu"
+    $(SUDO_CMD) "${PACKAGE_MANAGER}" update -y
+    $(SUDO_CMD) "${PACKAGE_MANAGER}" upgrade -y
+    $(SUDO_CMD) "${PACKAGE_MANAGER}" dist-upgrade -y
+}
 
-    elif [[ "$VER" == "20.04" ]]; then
-        wget -qO - https://regolith-desktop.org/regolith.key | apt-key add -
+prepare_fedora() {
+    INF "Updating fedora"
+    ${SUDO_CMD} "${PACKAGE_MANAGER}" update -y
+    ${SUDO_CMD} "${PACKAGE_MANAGER}" upgrade -y
 
-        echo deb "[arch=amd64] https://regolith-desktop.org/release-ubuntu-focal-amd64 focal main" | \
-            sudo tee /etc/apt/sources.list.d/regolith.list
-    fi
+    # Unfortunately, in Fedora you can group applications cannot be installed via yum install but need to be handled differently
+    # Since I don't want to differentiate between ubuntu & fedora later, I need to install them here
+    ${SUDO_CMD} "${PACKAGE_MANAGER}" group install -y "${FEDORA_DEV_GROUP}"
+}
+
+configure_zsh() {
+    INF "Configure zsh"
     
-    rm -rf regolith.key
-
-    sudo apt update
-    sudo apt install i3-gaps
-}
-
-
-install_files()
-{
-
     sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-    git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+    git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
     install $(pwd)/.bashrc ~
-    install $(pwd)/.vimrc ~
     install $(pwd)/.zshrc ~
-    install -d $(pwd)/.i3 ~/.config/
-    install -d $(pwd)/.vim ~
-
-   #find $SOURCE_DIR -type f -exec install -Dm 755 "{}" "$TARGET_DIR/{}" \;
+    install $(pwd)/.p10k.zsh ~
 }
 
-show_postinstall_instructions()
-{
+configure_vim() {
+    INF "Configure vim"
+
+    git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+    install -d $(pwd)/.vim ~
+    install $(pwd)/.vimrc ~
+}
+
+configure_graphics() {
+    INF "Configure i3"
+
+    install -d $(pwd)/.i3 ~/.config/
+}
+
+show_postinstall_instructions() {
     echo ""
     echo "=================== INSTALLATION COMPLETE ===================" 
     echo " Open vim and run \':PluginInstall\'"
     echo ""
     echo " afterwards install YCM: python ~/.vim/bundle/YouCompleteMe/install.py"
     echo ""
-
 }
 
+install_base() {
+    INF "Start base installation"
 
-install_i3()
-{
-    INF "Start installation of i3"
-    sudo apt install -y ${I3_PACKAGES_COMMON}
+    if [[ "$PACKAGE_MANAGER" == "yum" ]]; then
+        prepare_fedora
+    elif [[ "$PACKAGE_MANAGER" == "apt" ]]; then
+        prepare_ubuntu
+    fi
 
-    install_i3_gaps
+    ${SUDO_CMD} "${PACKAGE_MANAGER}" install -y ${PACKAGES}
 
-}
-
-install_cmd()
-{
-    INF "Start installation of cmd packages"
-    sudo apt install -y ${CMD_PACKAGES_COMMON}
-
-}
-
-install_all()
-{
-    INF "Starting full installation"
-
-    install_cmd
-
-    install_i3 
-   
-    install_files
+    configure_zsh
+    configure_vim
 
     show_postinstall_instructions
 }
 
-usage()
-{
+
+install_graphics() {
+    INF "Start installation of i3 packages"
+
+    ${SUDO_CMD} "${PACKAGE_MANAGER}" install -y ${PACKAGES_FULL}
+
+    # don't forget to install i3 gaps
+    configure_graphics
+}
+
+usage() {
     echo "Usage: "
-    echo "      $0 -iuh"
+    echo "      $0 -ibuh"
     echo "      -h|--help:      Print this message"
-    echo "      -i|--install:   Install the current configuratio on the machine"
+    echo "      -i|--install:   Install the current configuration for grphical usage on the machine (this also installs the console config)"
+    echo "      -b|--base:      Install the current configuration for console only usage on the machine"
     echo "      -u|--update:    Copy the configuration and update the repository"
     echo "                      This option is ment to be run as a coronjon"
 }
 
 
-update_config()
-{
+update_config() {
     ERR "Not Yet Implemented"
     #DIRTY_FILES
+    exit 1
 }
 
-FULL_PATH=$(realpath $0)
-REL_DIR=$(dirname $FULL_PATH)
+FULL_PATH=$(realpath "$0")
+REL_DIR=$(dirname "$FULL_PATH")
 SOURCE_DIR="$REL_DIR/home"
+
+if [[ $(which apt) ]]; then
+    INF "Ubuntu found. Using apt"
+    PACKAGE_MANAGER="apt"
+    PACKAGES="$COMMON_BASE $UBUNTU_BASE"
+    PACKAGES_FULL="$PACKAGES $COMMON_GRAPHICAL"  
+elif [[ $(which yum) ]]; then
+    INF "Fedora found. Using yum"
+    PACKAGE_MANAGER="yum"
+    PACKAGES="$COMMON_BASE $FEDORA_BASE"
+    PACKAGES_FULL="$PACKAGES $COMMON_GRAPHICAL"
+else
+    ERR "Unsupported distribuion. I don't like change. Bailing out."
+    exit 1
+fi
 
 for i in "$@"; do
   case $i in
     -i|--install)
-        install_all
-        exit 0 ;;
+        install_graphics
+        ;&
+    -b|--base)
+        install_base
+        ;;
     -u|--update)
         update_config
         exit 0;;
@@ -185,4 +192,3 @@ for i in "$@"; do
         ;;
   esac
 done
-
