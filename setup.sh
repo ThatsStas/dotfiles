@@ -79,28 +79,29 @@ configure_zsh() {
     INF "Configure zsh"
     
     sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
-    install $(pwd)/.bashrc ~
-    install $(pwd)/.zshrc ~
+    cd ~/.oh-my-zsh/custom/plugins/ && git clone https://github.com/zsh-users/zsh-autosuggestions && cd -
 
-    git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ~/powerlevel10k
-    echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >>~/.zshrc
+    install $(pwd)/.bashrc "$HOME"
+    install $(pwd)/.zshrc "$HOME"
 
-    install $(pwd)/.p10k.zsh ~
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+
+    install $(pwd)/.p10k.zsh "$HOME"
 }
 
 configure_vim() {
     INF "Configure vim"
 
     git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-    install -d $(pwd)/.vim ~
-    install $(pwd)/.vimrc ~
+    install -d $(pwd)/.vim 
+    install $(pwd)/.vim/* "$HOME"/.vim
+    install $(pwd)/.vimrc "$HOME"
 }
 
 configure_graphics() {
     INF "Configure i3"
-
-    install -d $(pwd)/.i3 ~/.config/
+    install -d $HOME/.config/i3
+    install $(pwd)/i3/* "$HOME/.config/i3"
 }
 
 show_postinstall_instructions() {

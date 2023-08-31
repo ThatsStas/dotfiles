@@ -11,7 +11,7 @@ export PATH=$HOME/.bin:$HOME/bin:/usr/local/bin:$PATH:$HOME/code/crosstool-NG/bu
 
 
 # Path to your oh-my-zsh installation.
-export ZSH="/home/bloodsurfer/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh"
 export LC_ALL="en_US.UTF-8"
 
 # Set name of the theme to load --- if set to "random", it will
@@ -110,8 +110,6 @@ export EDITOR='vim'
 
 #export IDF_PATH=~/code/esp-idf
 
-#export PATH://home/bloodsurfer/jd2/JDownloader2:$PATH
-
 alias sb='screen /dev/ttyUSB0 115200'
 alias bb='bitbake'
 alias bbl='bitbake-layers'
@@ -121,8 +119,6 @@ alias v='vim'
 alias ds='bitbake -cdevshell '
 alias fc='bitbake -f -ccompile '
 alias nuke='rm -rf'
-alias s1='ssh build1 -X'
-alias s2='ssh build2'
 alias lt='ls -lthr'
 
 alias sb0='screen /dev/ttyUSB0 115200'
@@ -131,19 +127,6 @@ alias sb2='screen /dev/ttyUSB2 115200'
 alias sb3='screen /dev/ttyUSB3 115200'
 alias sb4='screen /dev/ttyUSB4 115200'
 alias sb5='screen /dev/ttyUSB5 115200'
-
-alias b='ssh root@192.168.3.11'
-
-src() {
-    if [[ $(pwd) == *"secc-zeus-sdk"* ]]; then 
-        . ~/secc-zeus-sdk/environment-setup-cortexa9t2hf-neon-phytec-linux-gnueabi
-        exit
-    fi
-    if [[ $(pwd) == *"secc-zeus"* ]]; then 
-        . ~/secc-zeus/sources/poky/oe-init-build-env
-        exit
-    fi
-}
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
