@@ -28,6 +28,7 @@ declare -r COMMON_BASE=" \
     automake \
     cmake \
     shellcheck \
+    fzf \
 "
 
 declare -r UBUNTU_BASE=" \
@@ -84,6 +85,8 @@ configure_zsh() {
     install $(pwd)/.zshrc "$HOME"
 
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+
+    git clone https://github.com/joshskidmore/zsh-fzf-history-search ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/..
 
     install $(pwd)/.p10k.zsh "$HOME"
 }
