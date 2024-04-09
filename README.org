@@ -1,4 +1,4 @@
 * Readme
-** Todo items:
-*** Add [[https://okular.kde.org/][okular]] to all targets
-*** Fix ubuntu 22.04 deps (i3-gaps moved to i3 codebase but Ubuntu doesn't ship the newest i3 version)
+** TODO items:
+*** [ ] Add [[https://okular.kde.org/][okular]] to all targets
+*** [ ] Fix ubuntu 22.04 deps (i3-gaps moved to i3 codebase but Ubuntu doesn't ship the newest i3 version)
