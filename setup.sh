@@ -29,6 +29,7 @@ declare -r COMMON_BASE=" \
     cmake \
     shellcheck \
     fzf \
+    wget \
 "
 
 declare -r UBUNTU_BASE=" \
