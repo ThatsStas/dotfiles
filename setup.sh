@@ -39,12 +39,14 @@ declare -r UBUNTU_BASE=" \
     exuberant-ctags \
     clang-format \
 "
+# Docker is installed separetly in the "prepare_fedora" method
 declare -r FEDORA_BASE=" \
     yajl-devel \
     libverto-libev-devel \
     ctags \
     vim-omnicppcomplete \
     python3-devel \
+    dnf-plugins-core \
 "
 
 declare -r FEDORA_DEV_GROUP="C Development Tools and Libraries"
@@ -73,6 +75,12 @@ prepare_fedora() {
     # Unfortunately, in Fedora you can group applications cannot be installed via yum install but need to be handled differently
     # Since I don't want to differentiate between ubuntu & fedora later, I need to install them here
     ${SUDO_CMD} "${PACKAGE_MANAGER}" group install -y "${FEDORA_DEV_GROUP}"
+
+    # Again, docker is special and requires a separate repo. I don't want to run the installation process again later.
+    # Instructions based on https://docs.docker.com/engine/install/fedora/
+    ${SUDO_CMD} "${PACKAGE_MANAGER}" config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+    ${SUDO_CMD} "${PACKAGE_MANAGER}" docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+ docker-compose
 }
 
 configure_zsh() {
