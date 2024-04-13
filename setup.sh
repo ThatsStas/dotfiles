@@ -79,9 +79,8 @@ prepare_fedora() {
 
     # Again, docker is special and requires a separate repo. I don't want to run the installation process again later.
     # Instructions based on https://docs.docker.com/engine/install/fedora/
-    ${SUDO_CMD} "${PACKAGE_MANAGER}" config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
-    ${SUDO_CMD} "${PACKAGE_MANAGER}" install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
- docker-compose
+    ${SUDO_CMD} "${PACKAGE_MANAGER}" config-manager -y --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+    ${SUDO_CMD} "${PACKAGE_MANAGER}" install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 }
 
 configure_zsh() {
