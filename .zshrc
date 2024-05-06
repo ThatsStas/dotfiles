@@ -116,13 +116,7 @@ export EDITOR='vim'
 #export IDF_PATH=~/code/esp-idf
 
 alias sb='screen /dev/ttyUSB0 115200'
-alias bb='bitbake'
-alias bbl='bitbake-layers'
-alias bbu='bitbake update-bundle'
-alias s='ssh board'
 alias v='vim'
-alias ds='bitbake -cdevshell '
-alias fc='bitbake -f -ccompile '
 alias nuke='rm -rf'
 alias lt='ls -lthr'
 

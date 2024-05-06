@@ -1,6 +1,22 @@
 #!/bin/bash
 
-set -e
+# TODO General ideas
+# Install dependencies like VSCode, qmk deps, doom emacs
+# TODO qmk:
+#   dnf install dnf-util libusb
+#   https://github.com/samhocevar-forks/qmk-firmware/blob/master/docs/getting_started_build_tools.md
+# TODO emacs:
+#   https://github.com/doomemacs/doomemacs?tab=readme-ov-file#install
+# TODO Add optional package like
+#       nextcloud-client
+# TODO Fix graphical
+#       sway waybar (deps for wdisplays and wdisplays itself)
+# TODO Fix notification
+#       I think that's what fixed the issue:
+#       sudo dnf copr enable erikreider/SwayNotificationCenter
+#       sudo dnf install SwayNotificationCenter
+#
+set -ex
 
 PACKAGE_MANAGER=""
 SUDO_CMD="sudo "
@@ -30,6 +46,9 @@ declare -r COMMON_BASE=" \
     shellcheck \
     fzf \
     wget \
+    arandr \
+    autorandr \
+    sshfs \
 "
 
 declare -r UBUNTU_BASE=" \
@@ -41,6 +60,10 @@ declare -r UBUNTU_BASE=" \
     clang-format \
 "
 # Docker is installed separetly in the "prepare_fedora" method
+# On fedora, we now use wayland. we need to install wlr-randr (xrandr/arand wont work)
+# This one does work but requires some manual package installation: https://github.com/cyclopsian/wdisplays
+# like  (some might not be required/available), I've copied the content from the history
+# gtk3-devel python-scour wayland-protocols-devel wayland-devel wayland-scanner 
 declare -r FEDORA_BASE=" \
     yajl-devel \
     libverto-libev-devel \
@@ -48,17 +71,16 @@ declare -r FEDORA_BASE=" \
     vim-omnicppcomplete \
     python3-devel \
     dnf-plugins-core \
+    keepassxc \
+    redshift \
 "
 
 declare -r FEDORA_DEV_GROUP="C Development Tools and Libraries"
 
 declare -r COMMON_GRAPHICAL=" \
     emacs \
-    i3 \
     autorandr \
     feh \
-    i3-gaps \
-    i3blocks \
 "
 
 prepare_ubuntu() {
@@ -112,6 +134,10 @@ configure_graphics() {
     INF "Configure i3"
     install -d $HOME/.config/i3
     install $(pwd)/i3/* "$HOME/.config/i3"
+    
+    # TODO configure i3blocks
+    # git clone https://github.com/vivien/i3blocks-contrib ~/.config/i3blocks
+    # cp .i3blocks ~
 }
 
 show_postinstall_instructions() {
@@ -133,6 +159,8 @@ install_base() {
     fi
 
     ${SUDO_CMD} "${PACKAGE_MANAGER}" install -y ${PACKAGES}
+
+    # install & configure wireguard
 
     configure_zsh
     configure_vim
@@ -178,9 +206,10 @@ if [[ $(which apt) ]]; then
     PACKAGES_FULL="$PACKAGES $COMMON_GRAPHICAL"  
 elif [[ $(which yum) ]]; then
     INF "Fedora found. Using yum"
-    PACKAGE_MANAGER="yum"
+    PACKAGE_MANAGER="dnf"
     PACKAGES="$COMMON_BASE $FEDORA_BASE"
     PACKAGES_FULL="$PACKAGES $COMMON_GRAPHICAL"
+    # TODO Install emacs & doom
 else
     ERR "Unsupported distribuion. I don't like change. Bailing out."
     exit 1
