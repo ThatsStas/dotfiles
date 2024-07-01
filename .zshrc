@@ -83,10 +83,10 @@ SAVEHIST=500000
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-    zsh-fzf-history-search
     git
     vi-mode
     zsh-autosuggestions
+    zsh-fzf-history-search
 )
 
 source $ZSH/oh-my-zsh.sh
