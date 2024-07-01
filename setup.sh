@@ -73,6 +73,7 @@ declare -r FEDORA_BASE=" \
     dnf-plugins-core \
     keepassxc \
     redshift \
+    golang \
 "
 
 declare -r FEDORA_DEV_GROUP="C Development Tools and Libraries"
@@ -116,6 +117,17 @@ configure_zsh() {
 
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 
+    if [[ type fzf ]]; then
+        pushd ~
+        git clone https://github.com/junegunn/fzf.git
+        cd fzf
+        make
+        make install
+        sudo cp bin/fzf /usr/bin
+        popd
+    fi
+
+    # requires fzf
     git clone https://github.com/joshskidmore/zsh-fzf-history-search ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-fzf-history-search
 
     install $(pwd)/.p10k.zsh "$HOME"
