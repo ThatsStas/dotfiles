@@ -117,7 +117,7 @@ configure_zsh() {
 
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 
-    if [[ type fzf ]]; then
+    if [[ ! $(type fzf) ]]; then
         pushd ~
         git clone https://github.com/junegunn/fzf.git
         cd fzf
