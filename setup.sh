@@ -213,11 +213,7 @@ update_config() {
     cp ${HOME}/.bashrc .
     cp ${HOME}/.zshrc .
     cp ${HOME}/.p10k.zsh .
-    cp ${HOME}/.config/doom/* doom/
-
-    git add --patch
-    #DIRTY_FILES
-    exit 1
+    cp -r ${HOME}/.config/doom/* doom/
 }
 
 FULL_PATH=$(realpath "$0")
