@@ -22,6 +22,7 @@ PACKAGE_MANAGER=""
 SUDO_CMD="sudo "
 PACKAGES=""
 PACKAGES_FULL=""
+declare -r BASE_PATH="$(realpath $0)"
 
 INF() {
     MSG="$1"
@@ -112,8 +113,8 @@ configure_zsh() {
     sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
     cd ~/.oh-my-zsh/custom/plugins/ && git clone https://github.com/zsh-users/zsh-autosuggestions && cd -
 
-    install $(pwd)/.bashrc "$HOME"
-    install $(pwd)/.zshrc "$HOME"
+    install "$BASE_PATH"/.bashrc "$HOME"
+    install "$BASE_PATH"/.zshrc "$HOME"
 
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 
@@ -130,22 +131,21 @@ configure_zsh() {
     # requires fzf
     git clone https://github.com/joshskidmore/zsh-fzf-history-search ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-fzf-history-search
 
-    install $(pwd)/.p10k.zsh "$HOME"
+    install ${BASE_PATH}/.p10k.zsh "$HOME"
 }
 
 configure_vim() {
     INF "Configure vim"
 
     git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-    install -d $(pwd)/.vim 
-    cp -a $(pwd)/.vim/* -t "$HOME"/.vim
-    install $(pwd)/.vimrc "$HOME"
+    cp -a "$BASE_PATH"/.vim/* -t "$HOME"/.vim
+    install "$BASE_PATH"/.vimrc "$HOME"
 }
 
 configure_graphics() {
     INF "Configure i3"
     install -d $HOME/.config/i3
-    install $(pwd)/i3/* "$HOME/.config/i3"
+    install "$BASE_PATH"/i3/* "$HOME/.config/i3"
     
     # TODO configure i3blocks
     # git clone https://github.com/vivien/i3blocks-contrib ~/.config/i3blocks
@@ -180,12 +180,19 @@ install_base() {
     show_postinstall_instructions
 }
 
+install_doom_emacs() {
+    git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.config/emacs
+    ${HOME}/.config/emacs/bin/doom install
+    install "$BASE_PATH"/doom/* "${HOME}/.config/doom"
+}
+
 
 install_graphics() {
     INF "Start installation of i3 packages"
 
     ${SUDO_CMD} "${PACKAGE_MANAGER}" install -y ${PACKAGES_FULL}
 
+    install_doom_emacs
     # don't forget to install i3 gaps
     configure_graphics
 }
@@ -202,7 +209,13 @@ usage() {
 
 
 update_config() {
-    ERR "Not Yet Implemented"
+    cp ${HOME}/.vimrc .
+    cp ${HOME}/.bashrc .
+    cp ${HOME}/.zshrc .
+    cp ${HOME}/.p10k.zsh .
+    cp ${HOME}/.config/doom/* doom/
+
+    git add --patch
     #DIRTY_FILES
     exit 1
 }
@@ -221,7 +234,6 @@ elif [[ $(which yum) ]]; then
     PACKAGE_MANAGER="dnf"
     PACKAGES="$COMMON_BASE $FEDORA_BASE"
     PACKAGES_FULL="$PACKAGES $COMMON_GRAPHICAL"
-    # TODO Install emacs & doom
 else
     ERR "Unsupported distribuion. I don't like change. Bailing out."
     exit 1

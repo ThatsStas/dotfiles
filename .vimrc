@@ -129,5 +129,4 @@ nnoremap <Leader>" mqva'l:s/\%V'\%V/"/g<CR>`q
 " Add quotes around (at start of, and at end of) visually selected text
 vnoremap <Leader>' <Esc>`>a'<Esc>`<i'<Esc>
 vnoremap <Leader>" <Esc>`>a"<Esc>`<i"<Esc>
-" Fix background issues in vim
-hi Normal guibg=NONE ctermbg=NONE
+
