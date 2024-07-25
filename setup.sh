@@ -214,6 +214,9 @@ update_config() {
     cp ${HOME}/.zshrc .
     cp ${HOME}/.p10k.zsh .
     cp -r ${HOME}/.config/doom/* doom/
+
+    sed -i "s#.*user-mail-address.*##g" doom/config.el
+    sed -i "s#.*user-full-name.*##g" doom/config.el
 }
 
 FULL_PATH=$(realpath "$0")
