@@ -1,0 +1,140 @@
+# Copied from https://github.com/logandonley/dotfiles/
+# based on https://www.youtube.com/watch?v=-RkANM9FfTM
+---
+- name: Machine setup
+  hosts: localhost
+  become: true
+  connection: local
+  gather_facts: true
+#  vars:
+#    flyctl_version: "0.1.130"
+#    pulumi_version: "v3.94.2"
+
+  tasks:
+    - name: Get my user
+      ansible.builtin.set_fact:
+        remote_regular_user: "{{ ansible_env.SUDO_USER or ansible_user_id }}"
+
+    - name: Install packages
+      ansible.builtin.dnf:
+        name:
+          - git
+          - htop
+          - vim
+          - firefox
+          - gh
+          - gnome-tweaks
+          - gcc
+          - helm
+          - go-task
+          - ripgrep
+          - poetry
+          - zsh
+          - fzf
+          - tmux
+          - ffmpeg-free
+          - zlib
+          - zlib-devel
+          - make
+          - patch
+          - bzip2
+          - bzip2-devel
+          - readline-devel
+          - sqlite
+          - sqlite-devel
+          - openssl-devel
+          - tk-devel
+          - libffi-devel
+          - xz-devel
+          - libuuid-devel
+          - gdbm-libs
+          - libnsl2
+          - wl-clipboard
+          - fd-find
+          - gcc-c++
+          - doctl
+          - helix
+          - "@Development Tools"
+          - "@C Development Tools and Libraries"
+          - autoconf
+          - ncurses-devel
+          - wxGTK-devel
+          - wxBase
+          - libiodbc
+          - libxslt
+          - fop
+          - inotify-tools
+          - unar
+        state: present
+
+    - name: Change shell to zsh
+      ansible.builtin.user:
+        name: "{{ remote_regular_user }}"
+        shell: /usr/bin/zsh
+
+    - name: Install DNF plugins core
+      ansible.builtin.dnf:
+        name: dnf-plugins-core
+        state: present
+        
+    - name: Import Microsoft GPG Key
+      ansible.builtin.rpm_key:
+        key: https://packages.microsoft.com/keys/microsoft.asc
+        state: present
+
+    - name: Add Visual Studio Code Repo
+      ansible.builtin.yum_repository:
+        name: vscode
+        description: Visual Studio Code
+        baseurl: https://packages.microsoft.com/yumrepos/vscode
+        gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+        gpgcheck: true
+        enabled: true
+
+    - name: Install VS Code
+      ansible.builtin.dnf:
+        name: code
+        state: present
+
+    - name: Add Docker repo
+      ansible.builtin.yum_repository:
+        name: docker
+        description: Docker repo
+        baseurl: "https://download.docker.com/linux/fedora/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/stable"
+        gpgkey: "https://download.docker.com/linux/fedora/gpg"
+        gpgcheck: true
+        enabled: true
+
+    - name: Install Docker
+      ansible.builtin.dnf:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+
+    - name: Add Docker group
+      ansible.builtin.group:
+        name: docker
+        state: present
+
+    - name: Add user to docker group
+      ansible.builtin.user:
+        name: "{{ remote_regular_user }}"
+        groups: docker
+        append: true
+
+    - name: Install Flatpak packages
+      community.general.flatpak:
+        name:
+          - org.videolan.VLC
+        state: present
+
+    - name: Ensure fonts directory
+      ansible.builtin.file:
+        path: "~{{ remote_regular_user }}/.fonts"
+        state: directory
+        mode: "0755"
+        owner: "{{ remote_regular_user }}"
