@@ -27,3 +27,7 @@
 
     - name: Run common configuration
       include_tasks: common.yml
+
+    - name: Run graphics configuration
+      include_tasks: graphical.yml
+      when: display_type.stdout != "none"

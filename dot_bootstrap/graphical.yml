@@ -1,7 +1,7 @@
 # Copied from https://github.com/logandonley/dotfiles/
 # based on https://www.youtube.com/watch?v=-RkANM9FfTM
 ---
-- name: Get my user
+- name: Get my user for graphical
   ansible.builtin.set_fact:
     remote_regular_user: "{{ ansible_env.SUDO_USER or ansible_user_id }}"
 - name: Install packages graphics
