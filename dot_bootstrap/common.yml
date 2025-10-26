@@ -24,7 +24,6 @@
       - bzip2
       - openssl
       - libnsl2
-      - gcc-c++1
       - "@Development Tools"
       - autoconf
       - inotify-tools
