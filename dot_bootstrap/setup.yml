@@ -1,20 +1,29 @@
-- name: Detect display server
-  ansible.builtin.shell: |
-    if [ -n "$(pgrep -a Xorg)" ]; then
-      echo X11
-    elif [ -n "$(pgrep -a wayland)" ] || [ -n "$(loginctl show-session $(loginctl | awk 'NR==2{print $1}') -p Type | cut -d= -f2)" ] && [ "$(loginctl show-session $(loginctl | awk 'NR==2{print $1}') -p Type | cut -d= -f2)" = "wayland" ]; then
-      echo Wayland
-    else
-      echo none
-    fi
-  args:
-    executable: /bin/bash
-  register: display_type
-  changed_when: false
+# Detect if we're running on a device running on a graphical desktop. If so, run in addition to the common.yml also the graphical.yml playbook.
+---
+- name: Machine setup
+  hosts: localhost
+  become: true
+  connection: local
+  gather_facts: true
 
-- name: Always run common configuration
-  import_playbook: common.yml
+  tasks:
+    - name: Detect display server (X11 or Wayland)
+      ansible.builtin.shell: |
+        if [ -n "$(pgrep -a Xorg)" ]; then
+          echo X11
+        elif loginctl show-session $(loginctl | awk 'NR==2{print $1}') -p Type | grep -q wayland; then
+          echo Wayland
+        else
+          echo none
+        fi
+      args:
+        executable: /bin/bash
+      register: display_type
+      changed_when: false
 
-- name: Include X11 or Wayland extended tasks
-  import_playbook: graphical.yml
-  when: display_type.stdout in ["X11", "Wayland"]
+    - name: Show detected display type
+      debug:
+        msg: "Detected display: {{ display_type.stdout }}"
+
+    - name: Run common configuration
+      include_tasks: common.yml

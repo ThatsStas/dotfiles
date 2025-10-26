@@ -6,27 +6,19 @@
   become: true
   connection: local
   gather_facts: true
-#  vars:
-#    flyctl_version: "0.1.130"
-#    pulumi_version: "v3.94.2"
-
   tasks:
     - name: Get my user
       ansible.builtin.set_fact:
         remote_regular_user: "{{ ansible_env.SUDO_USER or ansible_user_id }}"
 
-    - name: Install packages
+    - name: Install packages core
       ansible.builtin.dnf:
         name:
           - git
           - htop
           - vim
-          - firefox
           - gh
-          - gnome-tweaks
           - gcc
-          - helm
-          - go-task
           - ripgrep
           - poetry
           - zsh
@@ -34,37 +26,15 @@
           - tmux
           - ffmpeg-free
           - zlib
-          - zlib-devel
           - make
           - patch
           - bzip2
-          - bzip2-devel
-          - readline-devel
-          - sqlite
-          - sqlite-devel
-          - openssl-devel
-          - tk-devel
-          - libffi-devel
-          - xz-devel
-          - libuuid-devel
-          - gdbm-libs
+          - openssl
           - libnsl2
-          - wl-clipboard
-          - fd-find
-          - gcc-c++
-          - doctl
-          - helix
+          - gcc-c++1
           - "@Development Tools"
-          - "@C Development Tools and Libraries"
           - autoconf
-          - ncurses-devel
-          - wxGTK-devel
-          - wxBase
-          - libiodbc
-          - libxslt
-          - fop
           - inotify-tools
-          - unar
         state: present
 
     - name: Change shell to zsh
@@ -75,25 +45,6 @@
     - name: Install DNF plugins core
       ansible.builtin.dnf:
         name: dnf-plugins-core
-        state: present
-        
-    - name: Import Microsoft GPG Key
-      ansible.builtin.rpm_key:
-        key: https://packages.microsoft.com/keys/microsoft.asc
-        state: present
-
-    - name: Add Visual Studio Code Repo
-      ansible.builtin.yum_repository:
-        name: vscode
-        description: Visual Studio Code
-        baseurl: https://packages.microsoft.com/yumrepos/vscode
-        gpgkey: https://packages.microsoft.com/keys/microsoft.asc
-        gpgcheck: true
-        enabled: true
-
-    - name: Install VS Code
-      ansible.builtin.dnf:
-        name: code
         state: present
 
     - name: Add Docker repo
@@ -125,12 +76,6 @@
         name: "{{ remote_regular_user }}"
         groups: docker
         append: true
-
-    - name: Install Flatpak packages
-      community.general.flatpak:
-        name:
-          - org.videolan.VLC
-        state: present
 
     - name: Ensure fonts directory
       ansible.builtin.file:
