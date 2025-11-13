@@ -18,7 +18,7 @@ install_on_mac() {
 OS="$(uname -s)"
 case "${OS}" in
     Linux*)
-        if [ -f /etc/fedora-release ]; then
+        if [ -f /etc/fedora-release ] || [ -f /etc/amazon-linux-release ]; then
             install_on_fedora
         elif [ -f /etc/lsb-release ]; then
             install_on_ubuntu
