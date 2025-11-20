@@ -2,33 +2,30 @@
 # Copied from https://github.com/logandonley/dotfiles
 # based on https://www.youtube.com/watch?v=-RkANM9FfTM
 
-install_on_fedora() {
-    sudo dnf install -y ansible
-}
-
-install_on_ubuntu() {
-    sudo apt-get update
-    sudo apt-get install -y ansible
-}
-
-install_on_mac() {
-    brew install ansible
-}
-
 OS="$(uname -s)"
 case "${OS}" in
     Linux*)
-        if [ -f /etc/fedora-release ] || [ -f /etc/amazon-linux-release ]; then
-            install_on_fedora
-        elif [ -f /etc/lsb-release ]; then
-            install_on_ubuntu
-        else
-            echo "Unsupported Linux distribution"
-            exit 1
-        fi
-        ;;
-    Darwin*)
-        install_on_mac
+        source /etc/os-release
+        case "$ID" in
+            fedora|amzn)
+                if [[ "$VERSION_ID" == "2" ]]; then
+                    # on amazon linx 2, ansible is not in the repos so we need to install it
+                    # from pypi using pip.
+                    sudo yum install -y python3 python3-pip
+                    python3 -m pip install ansible --user
+                    
+                elif [[ "$VERSION_ID" == "2023" ]]; then
+                    sudo dnf install -y ansible
+                fi
+                ;;
+            ubuntu)
+                sudo apt-get update && sudo apt-get install -y ansible
+                ;;
+            *)
+                echo "Unsupported Linux distribution"
+                exit 1
+                ;;
+        esac
         ;;
     *)
         echo "Unsupported operating system: ${OS}"
