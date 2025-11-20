@@ -238,7 +238,7 @@ exec pactl -- set-sink-volume $(pactl list sinks short | grep "GSP_370" | cut -f
 
 output DP-1 position 0 0 scale 0.66
 output HDMI-A-2 position 3901 0
-output HDMI-A-1 position 7741 0 transform 90
+output HDMI-A-1 position 7741 0 transform 0
 
 
 
