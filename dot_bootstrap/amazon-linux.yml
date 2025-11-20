@@ -5,7 +5,7 @@
   ansible.builtin.set_fact:
     remote_regular_user: "{{ ansible_env.SUDO_USER or ansible_user_id }}"
 - name: Install packages core
-  ansible.builtin.dnf:
+  ansible.builtin.package:
     name:
       - git
       - htop

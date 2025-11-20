@@ -5,7 +5,7 @@
   ansible.builtin.set_fact:
     remote_regular_user: "{{ ansible_env.SUDO_USER or ansible_user_id }}"
 - name: Install packages graphics
-  ansible.builtin.dnf:
+  ansible.builtin.package:
     name:
       - firefox
       - gnome-tweaks
@@ -30,7 +30,7 @@
     gpgcheck: true
     enabled: true
 - name: Install VS Code
-  ansible.builtin.dnf:
+  ansible.builtin.package:
     name: code
     state: present
 - name: Install Flatpak packages
