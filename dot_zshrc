@@ -115,7 +115,9 @@ export EDITOR='vim'
 
 #export IDF_PATH=~/code/esp-idf
 
-alias ls='lsd'
+if command -v lsd >/dev/null; then
+    alias ls='lsd'
+fi
 alias sb='screen /dev/ttyUSB0 115200'
 alias v='vim'
 alias nuke='rm -rf'
