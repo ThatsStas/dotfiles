@@ -21,26 +21,17 @@
       register: display_type
       changed_when: false
 
-    - name: Get current user
-      shell: whoami
-      become: no
-      register: current_user
-
     - name: Show detected display type
       debug:
         msg: "Detected display: {{ display_type.stdout }}"
 
-    - name: Show detected user
-      debug:
-        msg: "Detected user: {{ current_user.stdout }}"
-
     - name: Run amazon linux configuration
       include_tasks: amazon-linux.yml
-      when: current_user.stdout == "ec2-user"
+      when: ansible_distribution == "Amazon"
 
-    - name: Skip remeaining setup on ec2-user
+    - name: Skip remeaining setup for Amazon Linux setup
       meta: end_play
-      when: current_user.stdout == "ec2-user"
+      when: ansible_distribution == "Amazon"
 
     - name: Run common configuration
       include_tasks: common.yml

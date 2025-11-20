@@ -22,24 +22,7 @@
       - autoconf
     state: present
 
-#- name: Install packages additional
-#  ansible.builtin.dnf:
-#    name:
-#      - gh
-#      - lsd
-#      - kitty
-#      - ffmpeg-free
-#      - fzf
-#      - ripgrep
-#      - poetry
-#      - inotify-tools
-#      - libnsl2
-#  state: presetnt
 - name: Change shell to zsh
   ansible.builtin.user:
     name: "{{ remote_regular_user }}"
     shell: /usr/bin/zsh
-- name: Install DNF plugins core
-  ansible.builtin.dnf:
-    name: dnf-plugins-core
-    state: present
