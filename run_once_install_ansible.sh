@@ -7,7 +7,7 @@ case "${OS}" in
     Linux*)
         source /etc/os-release
         case "$ID" in
-            fedora|amzn)
+            fedora|amzn|rocky)
                 if [[ "$VERSION_ID" == "2" ]]; then
                     # on amazon linx 2, ansible is not in the repos so we need to install it
                     # from pypi using pip.
