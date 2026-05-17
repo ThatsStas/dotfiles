@@ -1,0 +1,8 @@
+# SSH config - add your hosts here
+# This file is managed by chezmoi but kept minimal.
+# Add machine-specific entries in ~/.ssh/config.d/ or directly here after apply.
+
+Host *
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+    AddKeysToAgent yes

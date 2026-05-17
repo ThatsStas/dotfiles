@@ -1,0 +1,18 @@
+[user]
+	name = {{ .name }}
+[color]
+	ui = auto
+[core]
+	pager = less -FMRiX
+[push]
+	default = simple
+[pull]
+	rebase = true
+[alias]
+	dag = log --graph --format='format:%C(yellow)%h%C(reset) %C(blue)\"%an\" <%ae>%C(reset) %C(magenta)%cr%C(reset)%C(auto)%d%C(reset)%n%s' --date-order
+	lg = log --oneline --graph --decorate
+	co = checkout
+	st = status
+	br = branch
+[init]
+	defaultBranch = main

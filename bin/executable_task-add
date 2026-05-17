@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -eq 0 ]]; then
+    echo "Usage: task-add <task description>"
+    exit 1
+fi
+
+NEW_TASK="$*"
+
+# Collect existing tasks (open + completed) as "UUID|description|status" lines
+TASKS=$(task export 2>/dev/null | jq -r '.[] | "\(.uuid)|\(.description)|\(.status)"')
+
+if [[ -z "$TASKS" ]]; then
+    task add "$NEW_TASK"
+    echo "✅ ADDED: '$NEW_TASK' — no existing tasks to compare against."
+    exit 0
+fi
+
+# Build the prompt for deduplication check
+PROMPT="You are a task deduplication checker. Compare the NEW TASK against the EXISTING TASKS below.
+Determine if the new task is semantically the same as any existing task (even if worded differently).
+
+EXISTING TASKS:
+$TASKS
+
+NEW TASK: $NEW_TASK
+
+Respond with EXACTLY one line in one of these formats (no other text):
+- NEW (if no duplicate found)
+- DUPLICATE_OPEN|<uuid> (if it matches an open/pending task)
+- DUPLICATE_DONE|<uuid> (if it matches a completed/deleted task)"
+
+
+RESULT=$(echo "$PROMPT" | kiro-cli chat --trust-tools= --wrap=never --no-interactive  2>/dev/null \
+    | sed 's/\x1b\[[0-9;]*m//g; s/^> //' | grep -E '^(NEW|DUPLICATE_)' | head -1 | tr -d '[:space:]')
+
+case "$RESULT" in
+    NEW)
+        task add "$NEW_TASK"
+        echo ""
+        echo "✅ ADDED: '$NEW_TASK' — no duplicate found."
+        ;;
+    DUPLICATE_OPEN\|*)
+        UUID="${RESULT#DUPLICATE_OPEN|}"
+        DESC=$(echo "$TASKS" | grep "^$UUID" | cut -d'|' -f2)
+        echo "⚠️  SKIPPED: '$NEW_TASK'"
+        echo "   Duplicate of open task: '$DESC' (UUID: $UUID)"
+        ;;
+    DUPLICATE_DONE\|*)
+        UUID="${RESULT#DUPLICATE_DONE|}"
+        DESC=$(echo "$TASKS" | grep "^$UUID" | cut -d'|' -f2)
+        echo "⚠️  MATCH: '$NEW_TASK'"
+        echo "   Matches completed task: '$DESC' (UUID: $UUID)"
+        echo ""
+        echo "What would you like to do?"
+        echo "  1) Revive the old task"
+        echo "  2) Add as new task anyway"
+        echo "  3) Drop (do nothing)"
+        read -rp "Choice [1/2/3]: " CHOICE
+        case "$CHOICE" in
+            1) task "$UUID" modify status:pending
+               echo "🔄 REVIVED: '$DESC' (UUID: $UUID)" ;;
+            2) task add "$NEW_TASK"
+               echo "✅ ADDED: '$NEW_TASK' — added despite completed duplicate." ;;
+            *) echo "🗑️  DROPPED: '$NEW_TASK' — no action taken." ;;
+        esac
+        ;;
+    *)
+        echo "⚠️  Could not parse LLM response: '$RESULT'"
+        task add "$NEW_TASK"
+        echo "✅ ADDED: '$NEW_TASK' — added as fallback."
+        ;;
+esac

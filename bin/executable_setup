@@ -1,0 +1,10 @@
+#!/bin/bash
+# Bootstrap script - runs chezmoi to apply dotfiles
+set -e
+
+if ! command -v chezmoi &>/dev/null; then
+  echo "Installing chezmoi..."
+  sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/bin"
+fi
+
+chezmoi init --apply

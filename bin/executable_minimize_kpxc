@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+WinLookupName=$1
+ActiveWinId=$(printf 0x0%x $(xdotool getactivewindow))
+LookupWinId=$(wmctrl -lx | grep -i $WinLookupName\.$WinLookupName | awk '{print $1}')
+
+if [ $LookupWinId = $ActiveWinId ]; then wmctrl -x -c $WinLookupName; else wmctrl -x -R $WinLookupName || $WinLookupName; fi
